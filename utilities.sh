@@ -34,7 +34,7 @@ html_title () {
     echo "<h1>${TEXTE_H1}</h1>"
 }
 
-# TODO. Renvoie la fin du document HTML
+# OK. Renvoie la fin du document HTML
 # Arguments :   AUCUN.
 html_tail () {
     cat <<- EOM
@@ -44,9 +44,8 @@ html_tail () {
 EOM
 }
 
-# TODO. Renvoie une balise <img> en HTML
+# OK. Renvoie une balise <img> en HTML
 # Arguments :   - Chemin vers une image
-# A faire :     - Vérifier que le fichier existe et vérifier son extension
 generate_img_fragment() {
     if [ "$#" -eq 0 ];
     then
@@ -67,6 +66,6 @@ generate_img_fragment() {
     echo "<img src=\"${nom_fichier}\" title=\"${nom_fichier}\" alt=\"${nom_fichier}\" />"
 }
 
-# BASE TEMPORAIRE DE TESTS  A SUPPRIMER
+# BASE TEMPORAIRE DE TESTS - A SUPPRIMER
 # generate_img_fragment tests_perso/test1.jpg
 # generate_img_fragment tests_perso/test8.png
