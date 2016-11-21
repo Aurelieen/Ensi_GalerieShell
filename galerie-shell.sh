@@ -1,5 +1,8 @@
 #! /bin/sh
 
+# INCLUSION DE FONCTIONS
+# . "./utilities.sh"
+
 # OK. --help/-h. Possibilités d'usage de la fonction
 usage() {
     cat << EOF
@@ -7,16 +10,20 @@ usage() {
 Utilisation: $(basename "$0") [options]
 Options :   --help          Afficher la liste des options
             --source REP    Choisir REP comme répertoire des images de départ
-            --dest REP      Choisir REP comme répertoire cible de génération
+            --dest REP      Choisir REP comme répertoire cible de génération.   Par défaut : /dest.
             --verb          Détailler les commandes du script
             --force         Regénérer les vignettes existantes
-            --index FICHIER Générer la galerie dans un fichier "FICHIER.html"
+            --index FICHIER Générer la galerie dans un fichier "FICHIER.html".  Par défaut : index.html.
 
 EOF
 }
 
 # TODO. Fonction principale qui redirige le résultat des arguments
 galerie_main() {
+    NOM_INDEX="index.html"
+    IS_VERBOSE=false
+    IS_FORCING=false
+
     while [ "$#" -ne 0 ];
     do
         case "$1" in
@@ -37,10 +44,10 @@ galerie_main() {
                 shift;
                 ;;
             "--verb")
-                IS_VERB=YES
+                IS_VERBOSE=true
                 ;;
             "--force")
-                IS_FORCE=YES
+                IS_FORCING=true
                 ;;
             *)
                 (>&2 echo "** Erreur. Argument non reconnu : $1")
@@ -51,11 +58,13 @@ galerie_main() {
         shift
     done
 
-    echo "NOM_INDEX : $NOM_INDEX"
-    echo "NOM_SOURCE : $NOM_SOURCE"
-    echo "NOM_DEST : $NOM_DEST"
-    echo "IS_VERB : $IS_VERB"
-    echo "IS_FORCE : $IS_FORCE"
+    # Présence minimale des arguments
+    # TODO.
+    
+    # Intégrité des arguments
+    verifier_index "$NOM_INDEX"             # Nom de l'index HTML
+    verifier_source "$NOM_SOURCE"           # Nom du répertoire source
+    verifier_dest   "$NOM_DEST"             # Nom du répertoire de destination
 }
 
 
@@ -64,6 +73,44 @@ galerie_main() {
 
 # TODO. Vérifier que le nom voulu en index est correctement formaté.
 # Arguments :   - Le nom du fichier index
+verifier_index() {
+    if [ "$1" = "" ] || [ "${1: -5}" != ".html" ] || [ "${1: -4}" != ".htm" ];
+    then
+        (>&2 echo "** Erreur. Nom de fichier index incorrect.")
+        usage
+        exit 1
+    fi
+}
+
+# TODO. Vérifier que le nom du répertoire source existe.
+# Arguments :   - Le nom du répertoire demandé
+verifier_source() {
+    if [ "$1" = "" ];
+    then
+        (>&2 echo "** Erreur. Aucun répertoire source spécifié.")
+        usage
+        exit 1
+    elif [ ! -d "$1" ];
+    then
+        (>&2 echo "** Erreur. Ce répertoire source n'existe pas : $1")
+        usage
+        exit 1
+    fi
+}
+
+# TODO. Vérifier que le répertoire de destination existe, sinon le créer.
+# Arguments :   - Le nom du répertoire demandé
+verifier_dest() {
+    if [ "$1" != "" ] && [ ! -d "$1" ];
+    then
+        mkdir -p "$1"
+        echo "** Note. Le répertoire cible $1 a été créé car il n'existait pas."
+    elif [ "$1" = "" ];
+    then
+        rm -fr dest
+        mkdir -p dest
+    fi
+}
 
 
 galerie_main "$@"
