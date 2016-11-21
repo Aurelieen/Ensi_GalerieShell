@@ -44,4 +44,29 @@ html_tail () {
 EOM
 }
 
-html_tail
+# TODO. Renvoie une balise <img> en HTML
+# Arguments :   - Chemin vers une image
+# A faire :     - Vérifier que le fichier existe et vérifier son extension
+generate_img_fragment() {
+    if [ "$#" -eq 0 ];
+    then
+        (>&2 echo "** Erreur. Aucun fichier transmis en entrée.")
+        exit 1
+    elif [ "${1: -4}" != ".jpg" ];
+    then
+        (>&2 echo "** Erreur. L'image n'est pas au format .jpg.")
+        exit 1
+    elif ! [ -f "$1" ];
+    then
+        (>&2 echo "** Erreur. Le fichier n'existe pas.")
+        exit 1
+    fi
+
+    # Génération de la balise d'image
+    nom_fichier="$(basename "$1")"
+    echo "<img src=\"${nom_fichier}\" title=\"${nom_fichier}\" alt=\"${nom_fichier}\" />"
+}
+
+# BASE TEMPORAIRE DE TESTS  A SUPPRIMER
+# generate_img_fragment tests_perso/test1.jpg
+# generate_img_fragment tests_perso/test8.png
