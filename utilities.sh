@@ -53,17 +53,24 @@ generate_img_fragment() {
         exit 1
     elif [ "${1: -4}" != ".jpg" ];
     then
-        (>&2 echo "** Erreur. L'image n'est pas au format .jpg.")
+        (>&2 echo "** Erreur. L'image $1 n'est pas au format .jpg.")
         exit 1
     elif ! [ -f "$1" ];
     then
-        (>&2 echo "** Erreur. Le fichier n'existe pas.")
+        (>&2 echo "** Erreur. Le fichier $1 n'existe pas.")
         exit 1
     fi
 
     # Génération de la balise d'image
     nom_fichier="$(basename "$1")"
     echo "<img src=\"${nom_fichier}\" title=\"${nom_fichier}\" alt=\"${nom_fichier}\" />"
+}
+
+
+# TODO. Fonction principale pour la génération des fichiers
+# Arguments :   - TODO.
+galerie_main() {
+    echo "TODO."
 }
 
 # BASE TEMPORAIRE DE TESTS - A SUPPRIMER

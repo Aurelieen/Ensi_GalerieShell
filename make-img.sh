@@ -5,11 +5,11 @@ if [ "$1" != "" ]; then
     target=$1
 else
     target=image.png
-fi	
+fi
 
 # Dummy sample text
 dummy_text () {
-    cat <<EOF
+    cat <<-EOF
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus non
 erat in diam hendrerit malesuada vel in justo. Donec augue metus,
 dapibus eu laoreet vitae, suscipit quis erat. Etiam id dolor eu sapien
@@ -32,10 +32,14 @@ bg=$(printf "#%02x%02x%02x" $((RANDOM % 100 + 155)) $((RANDOM % 100 + 155)) $((R
 # Dark text
 fg=$(printf "#%02x%02x%02x" $((RANDOM % 155)) $((RANDOM % 155)) $((RANDOM % 155)))
 
+
 dummy_text | convert -background "$bg" -fill "$fg" \
     -pointsize 36 \
     -page 800x600 \
     -flatten \
-    text:- "$target"
+    TEXT:- "$target"
+
+# convert -background "$bg" -fill "$fg" -pointsize 36 -page 800x600 -flatten "$target"
+# dummy_text | convert -background  lightblue  -fill blue  -pointsize 18 text:-    -trim +repage  -bordercolor lightblue  -border 3 text_trimmed.gif
 
 echo "$target created"

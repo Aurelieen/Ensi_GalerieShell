@@ -1,7 +1,8 @@
 #! /bin/sh
 
 # INCLUSION DE FONCTIONS
-# . "./utilities.sh"
+DIR=$(cd "$(dirname "$0")" && pwd)
+. "$DIR"//utilities.sh
 
 # OK. --help/-h. Possibilités d'usage de la fonction
 usage() {
@@ -19,7 +20,7 @@ EOF
 }
 
 # TODO. Fonction principale qui redirige le résultat des arguments
-galerie_main() {
+arguments_main() {
     NOM_INDEX="index.html"
     IS_VERBOSE=false
     IS_FORCING=false
@@ -60,9 +61,9 @@ galerie_main() {
 
     # Présence minimale des arguments
     # TODO.
-    
+
     # Intégrité des arguments
-    verifier_index "$NOM_INDEX"             # Nom de l'index HTML
+    verifier_index  "$NOM_INDEX"            # Nom de l'index HTML
     verifier_source "$NOM_SOURCE"           # Nom du répertoire source
     verifier_dest   "$NOM_DEST"             # Nom du répertoire de destination
 }
@@ -74,7 +75,7 @@ galerie_main() {
 # TODO. Vérifier que le nom voulu en index est correctement formaté.
 # Arguments :   - Le nom du fichier index
 verifier_index() {
-    if [ "$1" = "" ] || [ "${1: -5}" != ".html" ] || [ "${1: -4}" != ".htm" ];
+    if [ "$1" = "" ] || [ "${1: -5}" != ".html" ] ;
     then
         (>&2 echo "** Erreur. Nom de fichier index incorrect.")
         usage
@@ -104,13 +105,17 @@ verifier_dest() {
     if [ "$1" != "" ] && [ ! -d "$1" ];
     then
         mkdir -p "$1"
+        chmod 755 "$1"
         echo "** Note. Le répertoire cible $1 a été créé car il n'existait pas."
     elif [ "$1" = "" ];
     then
         rm -fr dest
         mkdir -p dest
+        chmod 755 dest
+    else
+        echo "TODO. Vérifier les droits d'écriture/lecture/exec dest"
     fi
 }
 
-
-galerie_main "$@"
+arguments_main "$@"         # Main de galerie-shell.sh pour traiter les arguments
+galerie_main # # #          # Main de utilities.sh pour la génération HTML
