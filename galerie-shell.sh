@@ -60,12 +60,25 @@ arguments_main() {
     done
 
     # Présence minimale des arguments
-    # TODO.
+    if [ "$NOM_DEST" != "" ];
+    then
+        NOM_DEST=$(pwd)/"$NOM_DEST"         # Rendre absolue la destination
+    fi
+
+    NOM_SOURCE=$(pwd)/"$NOM_SOURCE"         # Rendre absolu le chemin source
 
     # Intégrité des arguments
     verifier_index  "$NOM_INDEX"            # Nom de l'index HTML
     verifier_source "$NOM_SOURCE"           # Nom du répertoire source
     verifier_dest   "$NOM_DEST"             # Nom du répertoire de destination
+
+    if [ "$NOM_DEST" = "" ];
+    then
+        NOM_DEST="$(pwd)/dest"              # Rendre absolue la destination vide
+    fi
+
+    # echo "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST"
+    galerie_main "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST"         # Main de utilities.sh pour la génération HTML
 }
 
 
@@ -75,7 +88,7 @@ arguments_main() {
 # TODO. Vérifier que le nom voulu en index est correctement formaté.
 # Arguments :   - Le nom du fichier index
 verifier_index() {
-    if [ "$1" = "" ] || [ "${1: -5}" != ".html" ] ;
+    if [ "$1" = "" ] || [ "${1: -5}" != ".html" ];
     then
         (>&2 echo "** Erreur. Nom de fichier index incorrect.")
         usage
@@ -96,6 +109,9 @@ verifier_source() {
         (>&2 echo "** Erreur. Ce répertoire source n'existe pas : $1")
         usage
         exit 1
+    else
+        # TODO. Droits.
+        echo "TODO. Vérifier les droits de lecture/exec source"
     fi
 }
 
@@ -113,9 +129,9 @@ verifier_dest() {
         mkdir -p dest
         chmod 755 dest
     else
+        # TODO. Droits.
         echo "TODO. Vérifier les droits d'écriture/lecture/exec dest"
     fi
 }
 
 arguments_main "$@"         # Main de galerie-shell.sh pour traiter les arguments
-galerie_main # # #          # Main de utilities.sh pour la génération HTML

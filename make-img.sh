@@ -1,4 +1,7 @@
 #! /bin/bash
+# Get recent version of convert on CentOS
+LD_LIBRARY_PATH=/matieres/3MMUNIX/imagemagick/lib:"$LD_LIBRARY_PATH"
+PATH=/matieres/3MMUNIX/imagemagick/bin:"$PATH"
 # We need bash for $RANDOM
 
 if [ "$1" != "" ]; then

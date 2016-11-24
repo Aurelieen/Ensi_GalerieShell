@@ -10,14 +10,14 @@ html_head () {
         TITRE_PAGE="$1"
     fi
 
-    cat <<- EOM
-        <!doctype html>
-        <html>
-            <head>
-                <meta charset="utf8">
-                <title>${TITRE_PAGE}</title>
-            </head>
-            <body>
+cat <<- EOM
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <title>${TITRE_PAGE}</title>
+    </head>
+    <body>
 EOM
 }
 
@@ -37,10 +37,10 @@ html_title () {
 # OK. Renvoie la fin du document HTML
 # Arguments :   AUCUN.
 html_tail () {
-    cat <<- EOM
-                <!-- Pied de page du document HTML. -->
-            </body>
-        </html>
+cat <<- EOM
+        <!-- Pied de page du document HTML. -->
+    </body>
+</html>
 EOM
 }
 
@@ -66,13 +66,62 @@ generate_img_fragment() {
     echo "<img src=\"${nom_fichier}\" title=\"${nom_fichier}\" alt=\"${nom_fichier}\" />"
 }
 
+# TODO. Crée les vignettes qui n'existent pas déjà à partir des images sources
+# Arguments :   - dossier SOURCE, dossier DEST
+generate_vignette() {
+    for img in "${NOM_SOURCE}"/*.jpg;
+    do
+        # Si la vignette n'existe pas déjà dans le répertoire cible...
+        NOM_VIGNETTE="${NOM_DEST}/vignette_$(basename $img)"
+
+        if [ -f $img ] && [ ! -f $NOM_VIGNETTE ];
+        then
+            gmic $img -cubism , -resize 200,200 -output $NOM_VIGNETTE 2> /dev/null
+            echo "*** La vignette $(basename $NOM_VIGNETTE) a bien été générée."
+        else
+            # TODO. Améliorer la sortie et créer une barre de chargement.
+            echo "Existant."
+        fi
+    done
+}
+
+# TODO. Grouper les vignettes créées précédemment dans le fichier HTML
+# Arguments :   - Dossier DEST
+group_vignettes() {
+    for vignette in "${NOM_DEST}"/vignette_*.jpg;
+    do
+        generate_img_fragment $vignette
+    done
+}
+
+
+# TODO. Crée le fichier .HTML à partir des vignettes générées avant
+# Arguments :   - Nom de l'index, dossier DEST
+generate_html() {
+    NOM_INDEX="${NOM_DEST}/${NOM_INDEX}"
+
+    # Suppression de l'ancien fichier
+    if [ -f "$NOM_INDEX" ];
+    then
+        rm "$NOM_INDEX"
+    fi
+
+    # Ecrire le nouveau fichier
+    html_head > "$NOM_INDEX"
+    group_vignettes >> "$NOM_INDEX"
+    html_tail >> "$NOM_INDEX"
+}
 
 # TODO. Fonction principale pour la génération des fichiers
 # Arguments :   - TODO.
 galerie_main() {
-    echo "TODO."
-}
+    NOM_INDEX="$1"
+    NOM_SOURCE="$2"
+    NOM_DEST="$3"
 
-# BASE TEMPORAIRE DE TESTS - A SUPPRIMER
-# generate_img_fragment tests_perso/test1.jpg
-# generate_img_fragment tests_perso/test8.png
+    # 1. Génération des vignettes qui n'existent pas déjà
+    generate_vignette "$NOM_SOURCE" "$NOM_DEST"
+
+    # 2. Génération du fichier HTML dans le dossier des vignettes
+    generate_html "$NOM_INDEX" "$NOM_DEST"
+}
