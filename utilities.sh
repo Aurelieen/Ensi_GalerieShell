@@ -55,7 +55,7 @@ generate_img_fragment() {
     then
         (>&2 echo "** Erreur. L'image $1 n'est pas au format .jpg.")
         exit 1
-    elif ! [ -f "$1" ];
+    elif [ ! -f "$1" ];
     then
         (>&2 echo "** Erreur. Le fichier $1 n'existe pas.")
         exit 1
@@ -74,15 +74,43 @@ generate_vignette() {
         # Si la vignette n'existe pas déjà dans le répertoire cible...
         NOM_VIGNETTE="${NOM_DEST}/vignette_$(basename $img)"
 
-        if [ -f $img ] && [ ! -f $NOM_VIGNETTE ];
+        # Se prémunir des fausses images et du jeton *
+        if [ ! -f "$img" ];
         then
-            gmic $img -cubism , -resize 200,200 -output $NOM_VIGNETTE 2> /dev/null
-            echo "*** La vignette $(basename $NOM_VIGNETTE) a bien été générée."
+            break
+        fi
+
+        # Génération de la vignette
+        if [ "$IS_FORCING" = true ];
+        then
+            img_to_vignette "$img" "$NOM_VIGNETTE"
+            au_moins_une_generation=true
+            echo "*** [Mode Force] La vignette $(basename $NOM_VIGNETTE) a bien été générée."
         else
-            # TODO. Améliorer la sortie et créer une barre de chargement.
-            echo "Existant."
+            if [ ! -f "$NOM_VIGNETTE" ];
+            then
+                img_to_vignette "$img" "$NOM_VIGNETTE"
+                au_moins_une_generation=true
+                echo "*** La vignette $(basename $NOM_VIGNETTE) a bien été générée."
+            else
+                # TODO. Améliorer la sortie et créer une barre de chargement.
+                echo ">> $img. Génération impossible, vignette existante."
+            fi
         fi
     done
+
+    # Avertissement en cas d'absence de vignettes nouvelles.
+    if [ ! "$au_moins_une_generation" = true ];
+    then
+        (>&2 echo "")
+        (>&2 echo "** Note. Aucune vignette n'a pu être générée.")
+    fi
+}
+
+# TODO. Associe la création d'une vignette à une commande gmic
+# Arguments :   - Nom de l'image, nom de la vignette, [OPTIONS GMIC]
+img_to_vignette() {
+    gmic "$img" -cubism , -resize 200,200 -output "$NOM_VIGNETTE" 2> /dev/null
 }
 
 # TODO. Grouper les vignettes créées précédemment dans le fichier HTML
@@ -90,7 +118,10 @@ generate_vignette() {
 group_vignettes() {
     for vignette in "${NOM_DEST}"/vignette_*.jpg;
     do
-        generate_img_fragment $vignette
+        if [ -f "$vignette" ];
+        then
+            generate_img_fragment $vignette
+        fi
     done
 }
 
@@ -110,6 +141,10 @@ generate_html() {
     html_head > "$NOM_INDEX"
     group_vignettes >> "$NOM_INDEX"
     html_tail >> "$NOM_INDEX"
+
+    echo ''
+    echo "-- Fin de la génération --"
+    echo "-- firefox ${NOM_INDEX} pour voir le résultat. --"
 }
 
 # TODO. Fonction principale pour la génération des fichiers
@@ -118,9 +153,11 @@ galerie_main() {
     NOM_INDEX="$1"
     NOM_SOURCE="$2"
     NOM_DEST="$3"
+    IS_VERBOSE="$4"
+    IS_FORCING="$5"
 
     # 1. Génération des vignettes qui n'existent pas déjà
-    generate_vignette "$NOM_SOURCE" "$NOM_DEST"
+    generate_vignette "$NOM_SOURCE" "$NOM_DEST" "$IS_FORCING"
 
     # 2. Génération du fichier HTML dans le dossier des vignettes
     generate_html "$NOM_INDEX" "$NOM_DEST"

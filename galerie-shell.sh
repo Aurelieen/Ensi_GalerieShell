@@ -1,5 +1,22 @@
 #! /bin/sh
 
+# ------------------------
+# A FAIRE
+#   - Version parallèle
+#   - Forcer la création                                    OK.
+#   - Mode verbeux
+#   - Améliorer l'affichage HTML                            -
+#       - Ajouter une légende
+#       - Créer une page par image
+#   - Passer le validateur
+#   - Vérifier les droits d'écriture/de lecture
+#   - Ecrire des tests semi-automatisés
+#   - Barre de chargement pour les images
+#   - Ajouter des options (taille, cubism) dans Gmic
+#   - Message : aucune image détectée                       OK.
+# ------------------------
+
+
 # INCLUSION DE FONCTIONS
 DIR=$(cd "$(dirname "$0")" && pwd)
 . "$DIR"//utilities.sh
@@ -10,7 +27,7 @@ usage() {
 
 Utilisation: $(basename "$0") [options]
 Options :   --help          Afficher la liste des options
-            --source REP    Choisir REP comme répertoire des images de départ
+            --source REP    Choisir REP comme répertoire des images de départ.  Par défaut : actuel.
             --dest REP      Choisir REP comme répertoire cible de génération.   Par défaut : /dest.
             --verb          Détailler les commandes du script
             --force         Regénérer les vignettes existantes
@@ -65,20 +82,28 @@ arguments_main() {
         NOM_DEST=$(pwd)/"$NOM_DEST"         # Rendre absolue la destination
     fi
 
-    NOM_SOURCE=$(pwd)/"$NOM_SOURCE"         # Rendre absolu le chemin source
+    if [ "$NOM_SOURCE" != "" ];
+    then
+        NOM_SOURCE=$(pwd)/"$NOM_SOURCE"     # Rendre absolu le chemin source
+    fi
 
     # Intégrité des arguments
     verifier_index  "$NOM_INDEX"            # Nom de l'index HTML
     verifier_source "$NOM_SOURCE"           # Nom du répertoire source
     verifier_dest   "$NOM_DEST"             # Nom du répertoire de destination
 
+    # Présence des arguments par défaut
     if [ "$NOM_DEST" = "" ];
     then
         NOM_DEST="$(pwd)/dest"              # Rendre absolue la destination vide
     fi
 
-    # echo "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST"
-    galerie_main "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST"         # Main de utilities.sh pour la génération HTML
+    if [ "$NOM_SOURCE" = "" ];
+    then
+        NOM_SOURCE="$(pwd)"                 # Rendre absolu la source . (vide)
+    fi
+
+    galerie_main "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST" "$IS_VERBOSE" "$IS_FORCING" # Main de utilities.sh pour la génération HTML
 }
 
 
@@ -101,9 +126,7 @@ verifier_index() {
 verifier_source() {
     if [ "$1" = "" ];
     then
-        (>&2 echo "** Erreur. Aucun répertoire source spécifié.")
-        usage
-        exit 1
+        echo "** Note. Le répertoire source par défaut est le répertoire actuel ($(pwd))."
     elif [ ! -d "$1" ];
     then
         (>&2 echo "** Erreur. Ce répertoire source n'existe pas : $1")
@@ -125,12 +148,16 @@ verifier_dest() {
         echo "** Note. Le répertoire cible $1 a été créé car il n'existait pas."
     elif [ "$1" = "" ];
     then
-        rm -fr dest
-        mkdir -p dest
+        if [ ! -d dest ];
+        then
+            mkdir -p dest
+        fi
+
         chmod 755 dest
+        echo "** Note. Le répertoire cible par défaut est /dest."
     else
         # TODO. Droits.
-        echo "TODO. Vérifier les droits d'écriture/lecture/exec dest"
+        echo "TODO. Vérifier les droits d'écriture/lecture/exec destination"
     fi
 }
 
