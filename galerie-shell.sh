@@ -6,10 +6,10 @@
 #   - Forcer la création                                    OK.
 #   - Mode verbeux
 #   - Améliorer l'affichage HTML                            -
-#       - Ajouter une légende
+#       - Ajouter une légende                               1/2.
 #       - Créer une page par image
 #   - Passer le validateur
-#   - Vérifier les droits d'écriture/de lecture
+#   - Vérifier les droits d'écriture/de lecture             OK.
 #   - Ecrire des tests semi-automatisés
 #   - Barre de chargement pour les images
 #   - Ajouter des options (taille, cubism) dans Gmic
@@ -133,8 +133,16 @@ verifier_source() {
         usage
         exit 1
     else
-        # TODO. Droits.
-        echo "TODO. Vérifier les droits de lecture/exec source"
+        # Une source valide est 'r' et 'x' au minimum pour l'utilisateur.
+        permissions="$(stat -c %A "$1")"
+        permissions="${permissions:1:3}"
+
+        if [[ ! "$permissions" == r*x ]];
+        then
+            (>&2 echo "** Erreur. Les permissions sont insuffisantes pour la source : $1 ($(stat -c %A "$1"))")
+            usage
+            exit 1
+        fi
     fi
 }
 
@@ -156,8 +164,16 @@ verifier_dest() {
         chmod 755 dest
         echo "** Note. Le répertoire cible par défaut est /dest."
     else
-        # TODO. Droits.
-        echo "TODO. Vérifier les droits d'écriture/lecture/exec destination"
+        # Une destination valide est 'rwx' au minimum pour l'utilisateur.
+        permissions="$(stat -c %A "$1")"
+        permissions="${permissions:1:3}"
+
+        if [[ ! "$permissions" == rwx ]];
+        then
+            (>&2 echo "** Erreur. Les permissions sont insuffisantes pour la destination : $1 ($(stat -c %A "$1"))")
+            usage
+            exit 1
+        fi
     fi
 }
 

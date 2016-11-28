@@ -26,7 +26,7 @@ EOM
 html_title () {
     if [ "$#" -eq 0 ];
     then
-        TEXTE_H1="Image sans titre"
+        TEXTE_H1="Galerie d'images"
     else
         TEXTE_H1="$1"
     fi
@@ -63,7 +63,14 @@ generate_img_fragment() {
 
     # Génération de la balise d'image
     nom_fichier="$(basename "$1")"
-    echo "<img src=\"${nom_fichier}\" title=\"${nom_fichier}\" alt=\"${nom_fichier}\" />"
+    date_fichier="$(identify -format %[EXIF:DateTime] "$1")"
+
+    cat <<- EOM
+        <figure>
+            <img src="${nom_fichier}" title="${nom_fichier}" alt="${nom_fichier}" />
+            <figcaption>${nom_fichier/vignette_/} $date_fichier</figcaption>
+        </figure>
+EOM
 }
 
 # TODO. Crée les vignettes qui n'existent pas déjà à partir des images sources
@@ -139,6 +146,7 @@ generate_html() {
 
     # Ecrire le nouveau fichier
     html_head > "$NOM_INDEX"
+    html_title >> "$NOM_INDEX"
     group_vignettes >> "$NOM_INDEX"
     html_tail >> "$NOM_INDEX"
 
