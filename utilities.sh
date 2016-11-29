@@ -17,7 +17,22 @@ cat <<- EOM
         <meta charset="utf8">
         <title>${TITRE_PAGE}</title>
     </head>
+    <style>
+        figure {
+            width: 250px;
+            height: 250px;
+
+            display: inline-block;
+            text-align: center;
+            background-color: #F2F2F2;
+
+            border: 1px solid #BBB;
+            padding: 8px;
+            margin: 0;
+        }
+    </style>
     <body>
+        <main>
 EOM
 }
 
@@ -39,6 +54,7 @@ html_title () {
 html_tail () {
 cat <<- EOM
         <!-- Pied de page du document HTML. -->
+        </main>
     </body>
 </html>
 EOM
@@ -73,17 +89,16 @@ generate_img_fragment() {
     cat <<- EOM
         <figure>
             <img src="${nom_fichier}" title="${nom_fichier}" alt="${nom_fichier}" />
-            <figcaption>${nom_fichier/vignette_/} $date_fichier</figcaption>
+            <figcaption><span>${nom_fichier/vignette_/} $date_fichier</span></figcaption>
         </figure>
 EOM
 }
 
+
+# TODO. DEPRECATED.
 # TODO. Crée les vignettes qui n'existent pas déjà à partir des images sources
 # Arguments :   - dossier SOURCE, dossier DEST
 generate_vignette() {
-    generate_parallel_vignette "${NOM_SOURCE}"
-    return
-
     for img in "${NOM_SOURCE}"/*.jpg;
     do
         # Si la vignette n'existe pas déjà dans le répertoire cible...
@@ -138,7 +153,7 @@ generate_parallel_vignette() {
     # Génération de la commande parallèle
     # INFORMATIONS. Les noms des fichiers renvoyés par `find` sont
     # interprétés un par un et passés comme dernier argument.
-    find "${NOM_SOURCE}" -maxdepth 1 -name "*.jpg" -print0 | xargs -0 -n 1 -P 8 \
+    find "${NOM_SOURCE}" -maxdepth 1 -name "*.jpg" -print0 | xargs -0 -n 1 -P "${PARALLELES}" \
         bash -c 'parallel_img_to_vignette "$0" "$1" "$2" "$3" "$4"' \
         "${NOM_SOURCE}" "${NOM_DEST}" "${NOM_INDEX}" "${IS_FORCING}"
 
@@ -162,7 +177,7 @@ parallel_img_to_vignette() {
     # Prévention des images qui n'en sont pas
     if [ ! -f "$img" ];
     then
-        return
+        return 0
     fi
 
     NOM_VIGNETTE="${NOM_DEST}/vignette_$(basename $img)"
@@ -214,7 +229,8 @@ generate_html() {
     html_title >> "$NOM_INDEX"
 
     # 2. Génération des vignettes et de leur légende
-    generate_vignette "$NOM_SOURCE" "$NOM_DEST" "$IS_FORCING" "$NOM_INDEX"
+    generate_parallel_vignette "$NOM_SOURCE" "$NOM_DEST" \
+        "$IS_FORCING" "$NOM_INDEX" "$PARALLELES"
 
     # 3. Ecrire le nouveau fichier : pied-de-page
     html_tail >> "$NOM_INDEX"
@@ -233,7 +249,8 @@ galerie_main() {
 
     IS_VERBOSE="$4"
     IS_FORCING="$5"
+    PARALLELES="$6"
 
     # Génération du fichier HTML et des vignettes
-    generate_html "$NOM_INDEX" "$NOM_DEST" "$IS_FORCING"
+    generate_html "$NOM_INDEX" "$NOM_DEST" "$IS_FORCING" "$PARALLELES"
 }

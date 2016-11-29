@@ -15,6 +15,10 @@
 #   - Barre de chargement pour les images
 #   - Ajouter des options (taille, cubism) dans Gmic
 #   - Message : aucune image détectée                       OK. A revoir.
+#
+#   - A vérifier : si on ajoute des images et qu'on génère
+#     dans un répertoire avec un index.html, est-ce que
+#     toutes les images sont générées ou les nouvelles ?
 # ------------------------
 
 
@@ -199,7 +203,7 @@ verifier_parallele() {
             ;;
     esac
 
-    if [ "$PARALLELES" -lt 1 ] || [ "$PARALLELES" -gt 4 ];
+    if [ "$PARALLELES" -lt 1 ] || [ "$PARALLELES" -gt 10 ];
     then
         (>&2 echo "** Erreur. Le nombre ($PARALLELES) de vignettes à paralléliser doit être compris entre 1 et 4.")
         usage
