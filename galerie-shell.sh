@@ -2,18 +2,19 @@
 
 # ------------------------
 # A FAIRE
-#   - Version parallèle
+#   - Version parallèle                                     8/10.
 #   - Forcer la création                                    OK.
 #   - Mode verbeux
 #   - Améliorer l'affichage HTML                            -
-#       - Ajouter une légende                               1/2.
+#       - Ajouter une légende                               OK.
+#       - Aller plus loin sur les infos légendées           Formater la date.
 #       - Créer une page par image
 #   - Passer le validateur
 #   - Vérifier les droits d'écriture/de lecture             OK.
 #   - Ecrire des tests semi-automatisés
 #   - Barre de chargement pour les images
 #   - Ajouter des options (taille, cubism) dans Gmic
-#   - Message : aucune image détectée                       OK.
+#   - Message : aucune image détectée                       OK. A revoir.
 # ------------------------
 
 
@@ -32,6 +33,7 @@ Options :   --help          Afficher la liste des options
             --verb          Détailler les commandes du script
             --force         Regénérer les vignettes existantes
             --index FICHIER Générer la galerie dans un fichier "FICHIER.html".  Par défaut : index.html.
+            --parallel NB   Paralléliser la création de NB vignettes à la fois. Par défaut : 4.
 
 EOF
 }
@@ -39,6 +41,7 @@ EOF
 # TODO. Fonction principale qui redirige le résultat des arguments
 arguments_main() {
     NOM_INDEX="index.html"
+    PARALLELES="4"
     IS_VERBOSE=false
     IS_FORCING=false
 
@@ -67,6 +70,10 @@ arguments_main() {
             "--force")
                 IS_FORCING=true
                 ;;
+            "--parallel")
+                PARALLELES="$2"
+                shift;
+                ;;
             *)
                 (>&2 echo "** Erreur. Argument non reconnu : $1")
                 usage
@@ -88,9 +95,10 @@ arguments_main() {
     fi
 
     # Intégrité des arguments
-    verifier_index  "$NOM_INDEX"            # Nom de l'index HTML
-    verifier_source "$NOM_SOURCE"           # Nom du répertoire source
-    verifier_dest   "$NOM_DEST"             # Nom du répertoire de destination
+    verifier_index      "$NOM_INDEX"        # Nom de l'index HTML
+    verifier_source     "$NOM_SOURCE"       # Nom du répertoire source
+    verifier_dest       "$NOM_DEST"         # Nom du répertoire de destination
+    verifier_parallele  "$PARALLELES"       # Nombre de parallélisations
 
     # Présence des arguments par défaut
     if [ "$NOM_DEST" = "" ];
@@ -103,7 +111,10 @@ arguments_main() {
         NOM_SOURCE="$(pwd)"                 # Rendre absolu la source . (vide)
     fi
 
-    galerie_main "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST" "$IS_VERBOSE" "$IS_FORCING" # Main de utilities.sh pour la génération HTML
+    # Génération des fichiers dans utilities.sh
+    galerie_main "$NOM_INDEX" "$NOM_SOURCE" "$NOM_DEST" \
+                 "$IS_VERBOSE" "$IS_FORCING" \
+                 "$PARALLELES"
 }
 
 
@@ -174,6 +185,25 @@ verifier_dest() {
             usage
             exit 1
         fi
+    fi
+}
+
+# TODO. Vérifier que le nombre de parallélisations simultanées est correct.
+# Arguments :   - Le nombre PARALLELES demandé par l'utilisateur
+verifier_parallele() {
+    # C'est un entier
+    case "$PARALLELES" in
+        ''|*[!0-9]*)
+            (>&2 echo "** Erreur. Le nombre $PARALLELES de vignettes à paralléliser n'est pas entier.")
+            usage; exit 1
+            ;;
+    esac
+
+    if [ "$PARALLELES" -lt 1 ] || [ "$PARALLELES" -gt 4 ];
+    then
+        (>&2 echo "** Erreur. Le nombre ($PARALLELES) de vignettes à paralléliser doit être compris entre 1 et 4.")
+        usage
+        exit 1
     fi
 }
 
