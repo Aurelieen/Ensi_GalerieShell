@@ -2,23 +2,24 @@
 
 # ------------------------
 # A FAIRE
-#   - Version parallèle                                     8/10.
+#   - Version parallèle                                     OK.
 #   - Forcer la création                                    OK.
-#   - Mode verbeux
-#   - Améliorer l'affichage HTML                            -
+#   - Mode verbeux                                          .
+#   - Améliorer l'affichage HTML                            OK.
 #       - Ajouter une légende                               OK.
 #       - Aller plus loin sur les infos légendées           Formater la date.
-#       - Créer une page par image
-#   - Passer le validateur
+#       - Créer une page par image                          OK.
+#   - Passer le validateur                                  .
 #   - Vérifier les droits d'écriture/de lecture             OK.
-#   - Ecrire des tests semi-automatisés
-#   - Barre de chargement pour les images
-#   - Ajouter des options (taille, cubism) dans Gmic
-#   - Message : aucune image détectée                       OK. A revoir.
+#   - Ecrire des tests semi-automatisés                     .
+#   - Message : aucune image détectée                       .
 #
 #   - A vérifier : si on ajoute des images et qu'on génère
 #     dans un répertoire avec un index.html, est-ce que
 #     toutes les images sont générées ou les nouvelles ?
+#
+#   - Idem : si on régénère sans --force un dossier alors
+#     l'index se vide et les images disparaissent.
 # ------------------------
 
 
