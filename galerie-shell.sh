@@ -1,4 +1,5 @@
 #! /bin/sh
+# shellcheck disable=SC2039
 
 # ------------------------
 # A FAIRE
@@ -9,7 +10,7 @@
 #       - Ajouter une légende                               OK.
 #       - Aller plus loin sur les infos légendées           Formater la date.
 #       - Créer une page par image                          OK.
-#   - Passer le validateur                                  .
+#   - Passer le validateur                                  OK.
 #   - Vérifier les droits d'écriture/de lecture             OK.
 #   - Ecrire des tests semi-automatisés                     .
 #   - Message : aucune image détectée                       .
