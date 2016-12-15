@@ -161,6 +161,15 @@ verifier_source() {
             exit 1
         fi
     fi
+
+    repertoire=${1:-.}
+    nb_fichiers_jpg="$(find "$repertoire" -maxdepth 1 -mindepth 1 -type f -name "*.jpg" -exec printf x \; | wc -c)"
+    if [ "$nb_fichiers_jpg" -eq 0 ];
+    then
+        (>&2 echo "** Note. La source ne contient aucun fichier .JPG. La commande est sans effet.")
+        usage
+        exit 1
+    fi
 }
 
 # TODO. Vérifier que le répertoire de destination existe, sinon le créer.

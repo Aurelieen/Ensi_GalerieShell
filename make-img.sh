@@ -38,9 +38,10 @@ fg=$(printf "#%02x%02x%02x" $((RANDOM % 155)) $((RANDOM % 155)) $((RANDOM % 155)
 
 dummy_text | convert -background "$bg" -fill "$fg" \
     -pointsize 36 \
+    -font "Open-Sans-Light" \
     -page 800x600 \
     -flatten \
-    TEXT:- "$target"
+    TEXT:- "$target" 2> /dev/null
 
 # convert -background "$bg" -fill "$fg" -pointsize 36 -page 800x600 -flatten "$target"
 # dummy_text | convert -background  lightblue  -fill blue  -pointsize 18 text:-    -trim +repage  -bordercolor lightblue  -border 3 text_trimmed.gif

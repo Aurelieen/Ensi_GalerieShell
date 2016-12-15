@@ -234,7 +234,8 @@ html_image_and_buttons () {
         echo "<a href=\"${fichier_precedent}\" class=\"link\">Précédent</a>"
     fi
 
-    echo "<a href=\"../index.html\" class=\"link\" style=\"width: 200px;\">Retour à l'index</a>"
+    fichier_index="$(basename "${NOM_INDEX}")"
+    echo "<a href=\"../${fichier_index}\" class=\"link\" style=\"width: 200px;\">Retour à l'index</a>"
 
     # Ajout du bouton SUIVANT
     if [ "${fichier_suivant}" = "" ];
@@ -296,7 +297,7 @@ generate_img_fragment() {
     # On procède aux remplacements sur le nom du fichier
     safe_fichier="${nom_fichier/vignette_/}"
     safe_fichier="${nom_fichier//\\/__bslash__}"
-    safe_fichier_css="${safe_fichier/\'/\'}"
+    safe_fichier_css="${safe_fichier//\'/\'}"
 
     cat <<- EOM
         <figure style="background: url('${safe_fichier_css}');">
@@ -348,7 +349,7 @@ generate_parallel_vignette() {
 
         if [ "$img_actuel" != "" ];
         then
-            generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE"
+            generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX"
         fi
     done
 
@@ -356,7 +357,7 @@ generate_parallel_vignette() {
     img_actuel="$img_suivant"
     img_suivant=""
 
-    generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE"
+    generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX"
 }
 
 
@@ -507,7 +508,7 @@ generate_html_page() {
     fichier_nom="${fichier_nom//\"/__dquote__}"
 
     html_image_and_buttons "${NOM_SOURCE}" "${fichier_nom}" \
-        "${fichier_precedent}" "${fichier_suivant}" >> "$NOM_PAGE"
+        "${fichier_precedent}" "${fichier_suivant}" "${NOM_INDEX}">> "$NOM_PAGE"
     html_tail >> "$NOM_PAGE"
 }
 
