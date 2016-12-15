@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="style_carnet.css" />
+		<title>Rapport – Galerie d'images</title>
+	</head>
+	<body>
+		<div id="globalcontenu">
+			<p id="globalcontenu_titre">Rapport – « Galerie Shell »</p>
+			<p id="globalcontenu_chapo">Aurélien PEPIN – 1A_G2</p>
+			<div id="articles">
+				<section>
+					<h2><span class="numero">(1)</span> Contenu de l'archive</h2>
+					<p>
+						Le rendu contient :
+					</p>
+					<ul>
+						<li><span class="relatif">galerie-shell.sh</span>, l'exécutable qui génère la galerie ;</li>
+						<li><span class="relatif">utilities.sh</span>, le fichier qui contient l'ensemble des fonctions de génération ;</li>
+						<li><span class="relatif important">/rapport</span>, le dossier de ce rapport et du <code>shellcheck</code> ;</li>
+						<li><span class="relatif important">.git/</span>, le répertoire de travail Git ;</li>
+						<li>
+							<span class="relatif important">/tests</span>, le dossier des tests semi-automatisés qui contient :
+							<ul>
+								<li><span class="relatif">simple.sh</span> et <span class="relatif">star.sh</span>, les exécutables de test fournis par défaut</li>
+								<li><span class="relatif">test_[A, B, C, D, E, F, G, H].sh</span>, les exécutables ajoutés (avec difficulté graduelle)</li>
+								<li><span class="relatif">source_test[E, F, G, H]</span>, les répertoires de test particuliers à ne pas supprimer</li>
+							</ul>
+						</li>
+					</ul>
+
+					<p>
+						Le programme implémente la totalité des fonctionnalités minimales ainsi que celles de la partie « Pour aller plus loin ».
+						Il est actuellement en version 1.6.1 (cf. <code>git log</code>).
+					</p>
+				</section>
+				<section>
+					<h2><span class="numero">(2)</span> Tests</h2>
+					<p>
+						Le détail des tests apparaît lors de leur exécution. Pour exécuter un test, se déplacer
+						dans le dossier <code>tests</code> et exécuter <code>./test_X.sh</code>
+					</p>
+					<table>
+						<tr>
+							<th>Nom du test</th>
+							<th>Test</th>
+							<th>Comportement attendu</th>
+						</tr>
+						<tr>
+							<td>test_A.sh</td>
+							<td>Appel de la commande avec un minimum d'arguments.</td>
+							<td>La galerie n'est pas générée car /tests ne contient pas d'images.</td>
+						</tr>
+						<tr>
+							<td>test_B.sh</td>
+							<td>Galerie en mode verbeux, avec changement d'index et parallélisation.</td>
+							<td>Les images sont générées 7 par 7.</td>
+						</tr>
+						<tr>
+							<td>test_C.sh</td>
+							<td>La source et la destination ne sont pas dans le dossier du test ou de la galerie.</td>
+							<td>L'accès aux chemins relatifs est résolu correctement.</td>
+						</tr>
+						<tr>
+							<td>test_D.sh</td>
+							<td>La source et la destination comporte des espaces.</td>
+							<td>Les espaces ne perturbent pas la génération de la galerie.</td>
+						</tr>
+						<tr>
+							<td>test_E.sh</td>
+							<td>De fausses images .JPG sont ajoutées au test.</td>
+							<td>Les fausses images ne doivent pas être générées.</td>
+						</tr>
+						<tr>
+							<td>test_F.sh</td>
+							<td>Des images avec des caractères spéciaux sont ajoutées au test.</td>
+							<td>Les caractères spéciaux ne font pas échouer le programme.</td>
+						</tr>
+						<tr>
+							<td>test_G.sh</td>
+							<td>Tous les tests précédents sont compilés en un seul.</td>
+							<td>La galerie est générée malgré toutes les contraintes précédentes.</td>
+						</tr>
+						<tr>
+							<td>test_H.sh</td>
+							<td>De vraies images avec la date de prise de vue sont utilisées.</td>
+							<td>Les légendes de la galerie lisent les informations de l'image.</td>
+						</tr>
+					</table>
+					<p>
+						Pour certains tests, il est impossible d'utiliser la commande <span class="relatif">make-img</span>.
+						Des dossiers sources de test contenant des images de test ont donc été versionnées. Ces images prennent peu de place.
+						Il s'agit par exemple des images contenant une date de prise de vue pour le test des légendes.
+					</p>
+				</section>
+				<section>
+					<h2><span class="numero">(3)</span> Résultat du <code>shellcheck</code></h2>
+					<p>Cliquer sur l'image pour l'afficher en taille réelle.</p>
+					<a href="shellcheck_content.png" target="_blank">
+						<img src="shellcheck_content.png" alt="Résultat du shellcheck" title="Résultat du shellcheck">
+					</a>
+				</section>
+			</div>
+		</div>
+	</body>
+</html>

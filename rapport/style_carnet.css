@@ -68,3 +68,20 @@ a {
 	text-decoration: none;
 	font-weight: bold;
 }
+
+table {
+	border-collapse: collapse;
+}
+
+th, td {
+	border: 1px solid #A3A3A3;
+	padding: 3px;
+}
+
+tr th:first-child, tr td:first-child {
+	text-align: center;
+}
+
+img {
+	max-width: 100%;
+}

@@ -1,12 +1,12 @@
-#! /bin/sh
-# shellcheck disable=SC2039
+#! /bin/bash
+
 
 # TODO. Ecrit l'information passée en paramètre si le mode verbeux est activé.
 # Arguments :   - IS_VERBOSE, Message à diffuser
 echo_verbose() {
     if [ "$IS_VERBOSE" = true ] && [ "$#" -eq 2 ];
     then
-        echo "$2"
+        (>&2 echo "--V--> $2")
     fi
 }
 
@@ -285,6 +285,7 @@ generate_img_fragment() {
     # Génération de la balise d'image
     nom_fichier="$(basename "$1")"
     date_fichier="$(identify -format %[EXIF:DateTime] "$img")"
+    echo_verbose "$IS_VERBOSE" "Récupération des informations de l'image. "
 
     if [ "$date_fichier" = "" ];
     then
@@ -299,6 +300,7 @@ generate_img_fragment() {
     safe_fichier="${nom_fichier//\\/__bslash__}"
     safe_fichier_css="${safe_fichier//\'/\'}"
 
+    echo_verbose "$IS_VERBOSE" "Ajout de l'image dans le code HTML. "
     cat <<- EOM
         <figure style="background: url('${safe_fichier_css}');">
             <figcaption>
@@ -317,6 +319,7 @@ EOM
 # Arguments :   - TODO.
 generate_parallel_vignette() {
     # Exports des fonctions, impossible d'utiliser `xargs` sinon
+    export -f echo_verbose
     export -f generate_img_fragment
     export -f img_to_vignette
     export -f parallel_img_to_vignette
@@ -325,11 +328,12 @@ generate_parallel_vignette() {
     # INFORMATIONS. Les noms des fichiers renvoyés par `find` sont
     # interprétés un par un et passés comme dernier argument.
     find "${NOM_SOURCE}" -maxdepth 1 -name "*.jpg" -print0 | xargs -0 -n 1 -P "${PARALLELES}" \
-        bash -c 'parallel_img_to_vignette "$0" "$1" "$2" "$3" "$4"' \
-        "${NOM_SOURCE}" "${NOM_DEST}" "${NOM_INDEX}" "${IS_FORCING}"
+        bash -c 'parallel_img_to_vignette "$0" "$1" "$2" "$3" "$4" "$5"' \
+        "${NOM_SOURCE}" "${NOM_DEST}" "${NOM_INDEX}" "${IS_FORCING}" "${IS_VERBOSE}"
 
     # Quand les vignettes sont générées, on génère les pages uniques.
     # Trois variables pour l'image actuelle, l'image qui la précéde et celle qui suit.
+    echo_verbose "$IS_VERBOSE" "Création des dossiers pour les pleines pages. "
     mkdir -p "${NOM_DEST}/sources"
     mkdir -p "${NOM_DEST}/pages"
 
@@ -349,7 +353,8 @@ generate_parallel_vignette() {
 
         if [ "$img_actuel" != "" ];
         then
-            generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX"
+            echo_verbose "$IS_VERBOSE" "Génération de la page associée à l'image."
+            generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX" "$IS_VERBOSE"
         fi
     done
 
@@ -357,7 +362,8 @@ generate_parallel_vignette() {
     img_actuel="$img_suivant"
     img_suivant=""
 
-    generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX"
+    echo_verbose "$IS_VERBOSE" "Génération de la page associée à l'image."
+    generate_html_page "$NOM_DEST" "$img_precedent" "$img_actuel" "$img_suivant" "$NOM_SOURCE" "$NOM_INDEX" "$IS_VERBOSE"
 }
 
 
@@ -370,11 +376,13 @@ parallel_img_to_vignette() {
     NOM_DEST="$2"
     NOM_INDEX="$3"
     IS_FORCING="$4"
-    img="$5"                         # Attention, paramètre délégué en dernier !
+    IS_VERBOSE="$5"
+    img="$6"                         # Attention, paramètre délégué en dernier !
 
     # Prévention des images qui n'en sont pas
     if [ ! -f "$img" ] || [[ $(file -b "$img") != 'JPEG '* ]];
     then
+        echo_verbose "$IS_VERBOSE" "Abandon d'une image incorrecte. "
         return 0
     fi
 
@@ -383,24 +391,27 @@ parallel_img_to_vignette() {
     NOM_VIGNETTE="${NOM_VIGNETTE//\"/__dquote__}"
 
     # Résolution des conflits liés aux guillemets doubles dans `identify` et `gmic`
+    echo_verbose "$IS_VERBOSE" "Résolution des conflits de caractères spéciaux pour 'gmic'. "
     mv "$img" "${img//\"/__dquote__}"  2> /dev/null # `"` -> `__dquote__`
     img="${img//\"/__dquote__}"
 
     # Génération du code HTML et de la vignette
     if [ "$IS_FORCING" = true ];
     then
+        echo_verbose "$IS_VERBOSE" "Transformation de l'image en vignette. "
         img_to_vignette "$img" "$NOM_VIGNETTE"
         # au_moins_une_generation=true
 
-        generate_img_fragment "$NOM_VIGNETTE" "$img" >> "$NOM_INDEX"
+        generate_img_fragment "$NOM_VIGNETTE" "$img" "$IS_VERBOSE" >> "$NOM_INDEX"
         echo "*** [Mode Force] La vignette $(basename "$NOM_VIGNETTE") a bien été générée."
     else
         if [ ! -f "$NOM_VIGNETTE" ];
         then
+            echo_verbose "$IS_VERBOSE" "Transformation de l'image en vignette. "
             img_to_vignette "$img" "$NOM_VIGNETTE"
             # au_moins_une_generation=true
 
-            generate_img_fragment "$NOM_VIGNETTE" "$img" >> "$NOM_INDEX"
+            generate_img_fragment "$NOM_VIGNETTE" "$img" "$IS_VERBOSE" >> "$NOM_INDEX"
             echo "*** La vignette $(basename "$NOM_VIGNETTE") a bien été générée."
         else
             # TODO. Améliorer la sortie et créer une barre de chargement.
@@ -427,18 +438,22 @@ generate_html() {
     # Suppression de l'ancien fichier
     if [ -f "$NOM_INDEX" ];
     then
+        echo_verbose "$IS_VERBOSE" "Suppression de l'ancien index. "
         rm "$NOM_INDEX"
     fi
 
     # 1. Ecrire le nouveau fichier : en-tête
+    echo_verbose "$IS_VERBOSE" "Ecriture du nouvel index. "
     html_head "$NOM_INDEX" > "$NOM_INDEX"
     html_title >> "$NOM_INDEX"
 
     # 2. Génération des vignettes et de leur légende
+    echo_verbose "$IS_VERBOSE" "Début de la génération des vignettes. "
     generate_parallel_vignette "$NOM_SOURCE" "$NOM_DEST" \
-        "$IS_FORCING" "$NOM_INDEX" "$PARALLELES"
+        "$IS_FORCING" "$NOM_INDEX" "$PARALLELES" "$IS_VERBOSE"
 
     # 3. Ecrire le nouveau fichier : pied-de-page
+    echo_verbose "$IS_VERBOSE" "Fin de l'écriture du nouvel index. "
     html_tail >> "$NOM_INDEX"
 
     echo ''
@@ -457,6 +472,7 @@ generate_html_page() {
     # Suppression de l'ancien fichier
     if [ -f "$NOM_PAGE" ];
     then
+        echo_verbose "$IS_VERBOSE" "Suppression de l'ancienne pleine page de l'image. "
         rm "$NOM_PAGE"
     fi
 
@@ -476,6 +492,7 @@ generate_html_page() {
     if [ -f "${NOM_SOURCE}/${fichier_nom}" ];
     then
         fichier_remplace="${fichier_nom//\\/__bslash__}"
+        echo_verbose "$IS_VERBOSE" "Transfert de l'image vers les sources des pleines pages. "
         cp "${NOM_SOURCE}/${fichier_nom}" "${NOM_DEST}/sources/${fichier_remplace//\"/__dquote__}"
     else
         echo "oui mais non $fichier_nom"
@@ -525,5 +542,5 @@ galerie_main() {
     PARALLELES="$6"
 
     # Génération du fichier HTML et des vignettes
-    generate_html "$NOM_INDEX" "$NOM_DEST" "$IS_FORCING" "$PARALLELES"
+    generate_html "$NOM_INDEX" "$NOM_DEST" "$IS_FORCING" "$PARALLELES" "$IS_VERBOSE"
 }

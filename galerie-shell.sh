@@ -1,30 +1,8 @@
-#! /bin/sh
-# shellcheck disable=SC2039
-
-# ------------------------
-# A FAIRE
-#   - Version parallèle                                     OK.
-#   - Forcer la création                                    OK.
-#   - Mode verbeux                                          .
-#   - Améliorer l'affichage HTML                            OK.
-#       - Ajouter une légende                               OK.
-#       - Aller plus loin sur les infos légendées           Formater la date.
-#       - Créer une page par image                          OK.
-#   - Passer le validateur                                  OK.
-#   - Vérifier les droits d'écriture/de lecture             OK.
-#   - Ecrire des tests semi-automatisés                     .
-#   - Message : aucune image détectée                       .
-#
-#   - A vérifier : si on ajoute des images et qu'on génère
-#     dans un répertoire avec un index.html, est-ce que
-#     toutes les images sont générées ou les nouvelles ?
-#
-#   - Idem : si on régénère sans --force un dossier alors
-#     l'index se vide et les images disparaissent.
-# ------------------------
-
+#! /bin/bash
+# shellcheck source=utilities.sh
 
 # INCLUSION DE FONCTIONS
+
 DIR=$(cd "$(dirname "$0")" && pwd)
 . "$DIR"//utilities.sh
 
