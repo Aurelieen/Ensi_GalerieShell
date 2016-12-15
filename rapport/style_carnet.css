@@ -1,0 +1,70 @@
+body {
+	background: url('background.png');
+	background-attachment: fixed;
+	font-family: 'Metrophobic', Arial;
+	margin: 0;
+	overflow-x: hidden;
+}
+
+@font-face {
+	font-family: "Metrophobic";
+	src : url('Metrophobic.ttf') format('truetype'),
+		  url('Metrophobic.eot');
+}
+
+#globalcontenu {
+	width: 800px;
+	margin: auto;
+}
+
+#globalcontenu_titre {
+	font-size: 36px;
+	text-align: center;
+}
+
+#globalcontenu_chapo {
+	color: #A3A3A3;
+	text-align: center;
+	font-size: 20px;
+	margin: 0;
+	position: relative;
+	bottom: 40px;
+}
+
+#articles {
+	width: 800px;
+	overflow: auto;
+}
+
+#articles section {
+	width: 750px;
+	height: auto;
+	padding: 20px;
+	padding-top: 10px;
+	background-color: white;
+	border-radius: 4px;
+	border: 1px solid #A3A3A3;
+	box-shadow: -2px -2px 5px #B3B3B3 inset;
+	margin-bottom: 15px;
+}
+
+#articles section h2 {
+	text-indent: 20px;
+}
+
+.numero {
+	color: #A3A3A3;
+}
+
+.relatif {
+	font-style: italic;
+}
+
+.important {
+	font-weight: bold;
+}
+
+a {
+	text-decoration: none;
+	font-weight: bold;
+}

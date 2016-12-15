@@ -7,6 +7,7 @@ PATH="$HERE/..:$PATH"
 
 rm -fr source dest
 mkdir -p source dest
+mkdir -p images
 
 make-img.sh source/image-\*.jpg
 make-img.sh source/image2.jpg
