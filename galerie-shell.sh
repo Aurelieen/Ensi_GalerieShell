@@ -1,12 +1,26 @@
 #! /bin/bash
 # shellcheck source=utilities.sh
 
-# INCLUSION DE FONCTIONS
 
+# #################
+# # GALERIE SHELL #
+# #################
+
+# Liste des fonctions :
+#   - usage()               (rappeler l'utilisation de la galerie)
+#   - arguments_main()      (parser les arguments en entrée)
+#   - verifier_index()      (vérifier que le nom proposé pour l'index est correct)
+#   - verifier_source()     (vérifier que le répertoire source est lisible)
+#   - verifier_dest()       (vérifier que la destination est accessible ou la créer)
+#   - verifier_parallele()  (vérifier que le nombre d'images simultanées à générer est possible)
+
+
+# Inclusion de fonctions
 DIR=$(cd "$(dirname "$0")" && pwd)
 . "$DIR"//utilities.sh
 
-# OK. --help/-h. Possibilités d'usage de la fonction
+# OK. --help/-h.
+# Possibilités d'usage de la fonction
 usage() {
     cat << EOF
 
@@ -22,7 +36,8 @@ Options :   --help          Afficher la liste des options
 EOF
 }
 
-# TODO. Fonction principale qui redirige le résultat des arguments
+
+# OK. Fonction principale qui redirige le résultat des arguments
 arguments_main() {
     NOM_INDEX="index.html"
     PARALLELES="4"
@@ -105,7 +120,7 @@ arguments_main() {
 # Fonctions de vérification des arguments
 #########################################
 
-# TODO. Vérifier que le nom voulu en index est correctement formaté.
+# OK. Vérifier que le nom voulu en index est correctement formaté.
 # Arguments :   - Le nom du fichier index
 verifier_index() {
     if [ "$1" = "" ] || [ "${1: -5}" != ".html" ];
@@ -116,7 +131,8 @@ verifier_index() {
     fi
 }
 
-# TODO. Vérifier que le nom du répertoire source existe.
+
+# OK. Vérifier que le nom du répertoire source existe.
 # Arguments :   - Le nom du répertoire demandé
 verifier_source() {
     if [ "$1" = "" ];
@@ -150,7 +166,8 @@ verifier_source() {
     fi
 }
 
-# TODO. Vérifier que le répertoire de destination existe, sinon le créer.
+
+# OK. Vérifier que le répertoire de destination existe, sinon le créer.
 # Arguments :   - Le nom du répertoire demandé
 verifier_dest() {
     if [ "$1" != "" ] && [ ! -d "$1" ];
@@ -181,7 +198,8 @@ verifier_dest() {
     fi
 }
 
-# TODO. Vérifier que le nombre de parallélisations simultanées est correct.
+
+# OK. Vérifier que le nombre de parallélisations simultanées est correct.
 # Arguments :   - Le nombre PARALLELES demandé par l'utilisateur
 verifier_parallele() {
     # C'est un entier

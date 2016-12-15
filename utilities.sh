@@ -1,7 +1,26 @@
 #! /bin/bash
 
 
-# TODO. Ecrit l'information passée en paramètre si le mode verbeux est activé.
+# ################
+# # UTILITIES.SH #
+# ################
+
+# Liste des fonctions :
+#   - echo_verbose()                (écrire les messages --verb avec "--V-->" devant)
+#   - html_head()                   (renvoyer l'en-tête et le style de la galerie)
+#   - html_title()                  (ajouter un titre à la galerie)
+#   - html_image_and_buttons()      (ajouter l'image et son menu de navigation en pleine page)
+#   - html_tail()                   (terminer le fichier HTML)
+#   - generate_img_fragment()       (générer la figure pour la galerie)
+#   - generate_parallel_vignette()  (lister les vignettes à créer en mode parallèle)
+#   - parallel_img_to_vignette()    (passer de l'image à la vignette)
+#   - img_to_vignette()             (appeler gmic pour styliser la vignette)
+#   - generate_html()               (ouvrir le fichier de la galerie)
+#   - generate_html_page()          (ouvrir le fichier de pleine page d'une image)
+#   - galerie_main()                (récupérer les informations de galerie-shell.sh)
+
+
+# OK. Ecrit l'information passée en paramètre si le mode verbeux est activé.
 # Arguments :   - IS_VERBOSE, Message à diffuser
 echo_verbose() {
     if [ "$IS_VERBOSE" = true ] && [ "$#" -eq 2 ];
@@ -208,6 +227,7 @@ cat <<- EOM
 EOM
 }
 
+
 # OK. Renvoie un titre de niveau 1 en HTML
 # Arguments :   - Texte à titrer
 html_title () {
@@ -221,8 +241,10 @@ html_title () {
     echo "<h1>${TEXTE_H1}</h1>"
 }
 
-# TODO. Renvoie une image et deux boutons de navigation.
-# Arguments :   -
+
+# OK. Renvoie une image et deux boutons de navigation.
+# Arguments :   - Le fichier précédent, le fichier actuel, le fichier suivant
+#               - Le nom de l'index
 html_image_and_buttons () {
     echo "<nav>"
 
@@ -251,6 +273,7 @@ html_image_and_buttons () {
     echo "<img class=\"img_page\" src=\"../sources/${fichier_nom}\" alt=\"${fichier_nom}\" title=\"${fichier_nom}\" />"
 }
 
+
 # OK. Renvoie la fin du document HTML
 # Arguments :   AUCUN.
 html_tail () {
@@ -265,8 +288,9 @@ cat <<- EOM
 EOM
 }
 
+
 # OK. Renvoie une balise <img> en HTML
-# Arguments :   - Chemin vers une image
+# Arguments :   - Chemin vers une image, mode verbeux, date du fichier, image
 generate_img_fragment() {
     if [ "$#" -eq 0 ];
     then
@@ -315,8 +339,8 @@ EOM
 }
 
 
-# TODO. Version parallèle pour la génération des vignettes.
-# Arguments :   - TODO.
+# OK. Version parallèle pour la génération des vignettes.
+# Arguments :   - Source, destination, index, mode force, mode verbeux, parallélisation
 generate_parallel_vignette() {
     # Exports des fonctions, impossible d'utiliser `xargs` sinon
     export -f echo_verbose
@@ -367,8 +391,8 @@ generate_parallel_vignette() {
 }
 
 
-# TODO. Version parallèle de l'image à la vignette.
-# Arguments :   - TODO.
+# OK. Version parallèle de l'image à la vignette.
+# Arguments :   - Source, destination, index, mode force, mode verbeux, nom de l'image.
 # NB : `gmic` ne fonctionne pas s'il y a un guillemet double dans le nom d'un fichier
 #    : Pour cela, la solution est de renommer temporairement le fichier source
 parallel_img_to_vignette() {
@@ -423,15 +447,15 @@ parallel_img_to_vignette() {
 }
 
 
-# TODO. Associe la création d'une vignette à une commande gmic
-# Arguments :   - Nom de l'image, nom de la vignette, [OPTIONS GMIC]
+# OK. Associe la création d'une vignette à une commande gmic
+# Arguments :   - Nom de l'image, nom de la vignette
 img_to_vignette() {
     gmic "$img" -cubism , -resize 300,300 -output "$NOM_VIGNETTE" 2> /dev/null
 }
 
 
-# TODO. Crée le fichier .HTML à partir des vignettes générées avant
-# Arguments :   - Nom de l'index, dossier DEST
+# OK. Crée le fichier .HTML à partir des vignettes générées avant
+# Arguments :   - Nom de l'index, dossier DEST, mode verbeux
 generate_html() {
     NOM_INDEX="${NOM_DEST}/${NOM_INDEX}"
 
@@ -462,8 +486,8 @@ generate_html() {
 }
 
 
-# TODO. Crée la page .HTML d'une seule image
-# Arguments :
+# OK. Crée la page .HTML d'une seule image
+# Arguments :   - Image actuelle, vignette, destination, nom de la page, mode verbeux, source
 generate_html_page() {
     NOM_VIGNETTE="$(basename "$img_actuel")"
     NOM_VIGNETTE="${NOM_VIGNETTE%.*}.html"
@@ -530,8 +554,8 @@ generate_html_page() {
 }
 
 
-# TODO. Fonction principale pour la génération des fichiers
-# Arguments :   - TODO.
+# OK. Fonction principale pour la génération des fichiers
+# Arguments :   - Tous ceux de la ligne de commandes.
 galerie_main() {
     NOM_INDEX="$1"
     NOM_SOURCE="$2"
